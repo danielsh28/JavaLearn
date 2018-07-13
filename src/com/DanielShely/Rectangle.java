@@ -1,4 +1,4 @@
-package com.DanielShely.Shapes;
+package com.DanielShely;
 
 public class Rectangle extends  Shape {
     protected Double width;

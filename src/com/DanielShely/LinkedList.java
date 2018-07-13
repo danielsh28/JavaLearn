@@ -1,4 +1,4 @@
-package com.DanielShely.DataStructures;
+package com.DanielShely;
 
 
 import java.util.NoSuchElementException;

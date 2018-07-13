@@ -1,6 +1,4 @@
-package com.DanielShely.Shapes;
-
-import java.util.logging.Level;
+package com.DanielShely;
 
 public class Square  extends  Rectangle{
 

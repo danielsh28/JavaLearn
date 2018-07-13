@@ -1,6 +1,5 @@
-package com.DanielShely.Reflection;
+package com.DanielShely;
 
-import com.DanielShely.Shapes.*;
 
 import java.lang.Class;
 import java.lang.reflect.Field;

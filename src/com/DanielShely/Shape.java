@@ -1,4 +1,4 @@
-package com.DanielShely.Shapes;
+package com.DanielShely;
 
 public abstract class Shape {
 protected String color;

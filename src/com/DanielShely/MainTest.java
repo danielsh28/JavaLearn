@@ -1,14 +1,5 @@
 package com.DanielShely;
 
-import com.DanielShely.DataStructures.LinkedList;
-import com.DanielShely.Shapes.Circle;
-import com.DanielShely.Shapes.Rectangle;
-import com.DanielShely.Shapes.Shape;
-import com.DanielShely.Shapes.Square;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class MainTest {
