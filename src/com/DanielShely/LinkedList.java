@@ -80,7 +80,7 @@ public class LinkedList {
     public class LinkedListItr implements listIterator {
 
         private Node curr_node;
-
+        /* private method to peek current node data without increment to next node*/
         private Object getData(){
 
 

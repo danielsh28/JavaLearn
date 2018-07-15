@@ -1,31 +1,21 @@
     package com.DanielShely;
 
+    import java.io.FileWriter;
+    import java.io.IOException;
+    import java.io.PrintWriter;
+    import java.util.ArrayList;
+    import java.util.List;
     import java.util.NoSuchElementException;
 
 
-    public class Main{
-        public static void main(String[] args) throws ClassNotFoundException {
-          Outer out= new Outer();
-          Outer.Inner in=out.new Inner();
-          in.foo(23);
+    public class Main {
+        public static void main(String[] args) {
 
         }
     }
-   class Outer {
-
-        int x =0;
-
-       public class Inner {
-            int x=1;
-
-            void foo(int x){
-                System.out.println("x= " +x );
-                System.out.println("this.x= " + this.x);
-                System.out.println("Outer.thos.x= " + Outer.this.x);
-            }
-
-        }
 
 
-    }
+
+
+
 
