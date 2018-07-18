@@ -8,22 +8,25 @@ interface Output{
     public void printToOutput(String messege);
 }
 
-class ConsoleOutput implements Output{
+ class ConsoleOutput implements Output{
 
     public void printToOutput(String messege) {
         System.out.println(messege);
-    }
-}
+    }}
 
-public class VendingMachine {
 
-    static HashMap<PRODUCTS, Double> menu;
-    State state;
-    double money;
-    Output outMessege;
+public class VendingMachine  implements Runnable {
+
+    private static HashMap<PRODUCTS, Double> menu;
+    private State state;
+    private double money;
+    private Output outMessege;
+    private boolean isOn;
+    private volatile boolean timeFlag=true;
 
 
     static {
+        menu=new HashMap<PRODUCTS, Double>();
         menu.put(COLA, 5.5);
         menu.put(SPRITE, 7d);
         menu.put(WATER, 4d);
@@ -32,122 +35,222 @@ public class VendingMachine {
         menu.put(ORANGE_JUICE, 5.8);
     }
 
+    public  void  shutDown(){
+        this.isOn=false;
+    }
+    public VendingMachine(Output out) {
 
-    public VendingMachine() {
         state = State.IDLE;
+        isOn=true;
+        outMessege=out;
+        timeFlag=true;
     }
 
-    public void insertCoin(double coins) {
-        this.money = this.money + coins;
-       state= state.insertCoin();
+    public void insertCoin(double coin) {
+        synchronized (this) {
+                timeFlag=false;
+            if (coin < 0) {
+                throw new IllegalArgumentException("negative money is unreal, check coin recognition system!");
+            }
+            state.insertCoin(this, coin);
+            System.out.println("Flag is: " + timeFlag );
+
+        }
+
+    }
+    public void chooseItem(PRODUCTS prod){
+        synchronized (this) {
+            timeFlag=false;
+            state.chooseItem(this, prod);
+        }
+
+
+    }
+
+    public  void cancle() {
+        synchronized (this) {
+            timeFlag=false;
+            state.cancel(this);
+        }
+    }
+
+    public void run() {
+
+        while (true) {
+            try {
+
+                System.out.println("from the timout thread :flag is " + timeFlag);
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            synchronized (this) {
+
+                if (timeFlag) {
+                    outMessege.printToOutput("going to timeout from " + state.toString());
+                    state.timeout(this);
+                }
+            }
+
+        }
     }
 
 
     public enum PRODUCTS {COLA, SPRITE, WATER, BEER, FLAVOURED_WATER, ORANGE_JUICE}
 
-    enum State {
+    private enum State {
         IDLE {
             @Override
-            public State insertCoin() {
+            public void insertCoin(VendingMachine machine, double coin) {
 
-                return State.MONEY_INSERTED;
+                machine.money= machine.money + coin;
+                machine.outMessege.printToOutput(String.format("%.2f added",coin));
+                machine.outMessege.printToOutput(String.format("%.2f money in the machine", machine.money));
+                machine.state= State.MONEY_INSERTED;
             }
 
 
-            public State chooseItem(double money, PRODUCTS product) {
-                if (menu.get(product) >= money) {
-
-                    return State.SUPPLY_DRINK;
-
-                } else {
-                    return State.MONEY_INSERTED;
-                }
-            }
-
-            @Override
-            public State cancle() {
+            public void chooseItem(VendingMachine machine, PRODUCTS product) {
+                machine.outMessege.printToOutput("Please insert money First and then choose " +
+                        "your product!");
+                machine.state= State.IDLE;
 
             }
 
             @Override
-            public State timeout() {
+            public void cancel(VendingMachine machine) {
+
+                machine.outMessege.printToOutput("Cancle is irrelevent in Idle mode!");
+                machine.state= State.IDLE;
+
+            }
+
+            @Override
+            public void timeout(VendingMachine machine) {
+
+                machine.state= State.IDLE;
 
             }
         }, MONEY_INSERTED {
             @Override
-            public State insertCoin() {
+            public void insertCoin(VendingMachine machine, double coin) {
+                machine.money= machine.money + coin;
+                machine.outMessege.printToOutput(String.format("%.2f added",coin));
+                machine.outMessege.printToOutput(String.format("%.2f money in the machine", machine.money));
+                machine.state= State.MONEY_INSERTED;
 
             }
 
             @Override
-            public State chooseItem(double money, String product) {
+            public void chooseItem(VendingMachine machine ,PRODUCTS product) {
+                
+                double price= menu.get(product);
+                if (price  <= machine.money) {
+                     machine.outMessege.printToOutput("supplying " + product.toString());
+                    machine.money= machine.money- price;
+                    if(machine.money>0){
+                        machine.outMessege.printToOutput(String.format("return %.2f to costumer",machine.money));
+                        machine.money=0;
+                    }
+
+                    machine.state= State.SUPPLY_DRINK;
+                    machine.state=State.IDLE;
+
+
+                }
+                else {
+                    machine.outMessege.printToOutput(String.format("Not enough money! need to add " +
+                            "%.2f",price-machine.money));
+
+                    machine.state= State.MONEY_INSERTED;
+                }
+            }
+
+            @Override
+            public void cancel(VendingMachine machine) {
+                machine.outMessege.printToOutput(String.format("return %.2f to client",machine.money ));
+                machine.money=0;
+                machine.state= State.IDLE;
 
             }
 
             @Override
-            public State cancle() {
-
-            }
-
-            @Override
-            public State timeout() {
-
+            public void timeout(VendingMachine machine) {
+                machine.outMessege.printToOutput(String.format("return %.2f to customer due to time out",
+                        machine.money));
+                machine.money=0;
+                machine.state= State.IDLE;
+                
             }
 
         }, SUPPLY_DRINK {
             @Override
-            public State insertCoin() {
-
-
-            }
-
-            @Override
-            public State chooseItem(double money, String product) {
+            public void insertCoin(VendingMachine machine, double coin) {
+                machine.outMessege.printToOutput("Supplying Drink");
+                machine.state= State.IDLE;
 
             }
 
             @Override
-            public State cancle() {
+            public void chooseItem(VendingMachine machine, PRODUCTS product) {
+
+                    machine.outMessege.printToOutput("Supplying Drink");
+                    machine.state = State.IDLE;
 
             }
 
             @Override
-            public State timeout() {
+            public void cancel(VendingMachine machine) {
+                machine.outMessege.printToOutput("Cant Cancle while supplying item!");
+                machine.state= State.SUPPLY_DRINK;
+            }
+
+            @Override
+            public void timeout(VendingMachine machine) {
+                machine.state= State.IDLE;
 
             }
 
         }, CANCEL {
             @Override
-            public State insertCoin() {
+            public void insertCoin(VendingMachine machine, double coin) {
+                
+                machine.state= State.CANCEL;
+                
 
             }
 
             @Override
-            public State chooseItem(double money, String product) {
+            public void chooseItem(VendingMachine machine, PRODUCTS product) {
+
+                machine.outMessege.printToOutput("Cancel in progress! be patience!");
+
 
             }
 
             @Override
-            public State cancle() {
+            public void cancel(VendingMachine machine) {
+                machine.outMessege.printToOutput("Cancel in progress! be patience!");
+                machine.state=State.IDLE;
 
             }
 
             @Override
-            public State timeout() {
-
+            public void timeout(VendingMachine machine) {
+                machine.state= State.IDLE;
             }
 
 
         };
 
 
-        abstract public State insertCoin();
+        abstract public void insertCoin(VendingMachine machine, double coin);
 
-        abstract public State chooseItem(double money, String product);
+        abstract public void chooseItem(VendingMachine machine, PRODUCTS product);
 
-        abstract public State cancle();
+        abstract public void cancel(VendingMachine machine);
 
-        abstract public State timeout();
+        abstract public void timeout(VendingMachine machine);
 
 
     }
