@@ -22,7 +22,8 @@ public class VendingMachine  implements Runnable {
     private double money;
     private Output outMessege;
     private boolean isOn;
-    private volatile boolean timeFlag=true;
+    long lastTimeInvoked;
+
 
 
     static {
@@ -43,25 +44,26 @@ public class VendingMachine  implements Runnable {
         state = State.IDLE;
         isOn=true;
         outMessege=out;
-        timeFlag=true;
+        lastTimeInvoked=System.currentTimeMillis();
+
     }
 
     public void insertCoin(double coin) {
         synchronized (this) {
-                timeFlag=false;
             if (coin < 0) {
                 throw new IllegalArgumentException("negative money is unreal, check coin recognition system!");
             }
             state.insertCoin(this, coin);
-            System.out.println("Flag is: " + timeFlag );
+            lastTimeInvoked=System.currentTimeMillis();
 
         }
 
     }
     public void chooseItem(PRODUCTS prod){
         synchronized (this) {
-            timeFlag=false;
+
             state.chooseItem(this, prod);
+            lastTimeInvoked=System.currentTimeMillis();
         }
 
 
@@ -69,29 +71,33 @@ public class VendingMachine  implements Runnable {
 
     public  void cancle() {
         synchronized (this) {
-            timeFlag=false;
             state.cancel(this);
+            lastTimeInvoked=System.currentTimeMillis();
         }
     }
 
     public void run() {
-
+        long delta=0;
+        System.out.println("Starting run loop...");
         while (true) {
             try {
 
-                System.out.println("from the timout thread :flag is " + timeFlag);
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             synchronized (this) {
+            delta=System.currentTimeMillis() - lastTimeInvoked;
+                System.out.println("delta= " + delta);
+                if (delta >= 3000) {
 
-                if (timeFlag) {
+
                     outMessege.printToOutput("going to timeout from " + state.toString());
                     state.timeout(this);
-                }
-            }
 
+                }
+
+            }
         }
     }
 
@@ -120,7 +126,7 @@ public class VendingMachine  implements Runnable {
             @Override
             public void cancel(VendingMachine machine) {
 
-                machine.outMessege.printToOutput("Cancle is irrelevent in Idle mode!");
+                machine.outMessege.printToOutput("Cancel is irrelevant in Idle mode!");
                 machine.state= State.IDLE;
 
             }
@@ -186,7 +192,8 @@ public class VendingMachine  implements Runnable {
         }, SUPPLY_DRINK {
             @Override
             public void insertCoin(VendingMachine machine, double coin) {
-                machine.outMessege.printToOutput("Supplying Drink");
+                machine.outMessege.printToOutput(String.format("cant take money supplying Drink!" +
+                        "\n return  %.2f to Shekels to costumer",coin) );
                 machine.state= State.IDLE;
 
             }
@@ -214,7 +221,8 @@ public class VendingMachine  implements Runnable {
         }, CANCEL {
             @Override
             public void insertCoin(VendingMachine machine, double coin) {
-                
+                machine.outMessege.printToOutput(String.format("Cant insert coiins while canceling!" +
+                        "\n return %.2f Shekels to costumer",coin));
                 machine.state= State.CANCEL;
                 
 

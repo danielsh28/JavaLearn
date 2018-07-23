@@ -91,13 +91,13 @@ public class LinkedList {
             curr_node=node;
         }
 
-        @Override
+
         public boolean hasNext() {
             return curr_node.next !=null;
 
         }
 
-        @Override
+
         public Object next() throws NoSuchElementException{
 
             if(!(curr_node.next ==null)){

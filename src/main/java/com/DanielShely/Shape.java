@@ -1,8 +1,8 @@
 package com.DanielShely;
 
 public abstract class Shape {
-protected String color;
-protected boolean filled;
+    public  String color;
+    public  boolean filled;
 
      public Shape(String color, boolean filled){
          this.color=color;

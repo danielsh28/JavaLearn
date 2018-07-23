@@ -1,8 +1,9 @@
 package com.DanielShely;
 
 public class Rectangle extends  Shape {
-    protected Double width;
-    protected Double length;
+    public  Double width;
+    public Double length;
+    public static int statNum=0;
 
     public Rectangle() {
         super();

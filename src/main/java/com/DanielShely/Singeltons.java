@@ -4,15 +4,19 @@ import java.net.UnknownHostException;
 
 public  class Singeltons{
 
-
+    /*public static void main(String[] args) {
+        EagarInit eager = EagarInit.getEagerInitSingelton();
+        EagarInit eager2 = EagarInit.getEagerInitSingelton();
+        System.out.println(eager.);
+    }*/
 
 }
 
 /*using eager initilazation singlton to open some session with some fixed-application host  address*/
 class EagarInit{
     private static final  EagarInit instance= new EagarInit("fixedhost.ilrd.co.il");
-    String fixedHost;
-    EagarInit(String fixedHost){
+    private String fixedHost;
+    private EagarInit(String fixedHost){
         this.fixedHost=fixedHost;
     }
 
@@ -25,9 +29,9 @@ class EagarInit{
 /*using enum  also for fixed host address */
 enum EnumSingelton{
     SINGLE_INSTANCE( "fixedhost.ilrd.co.il" );
-    String fixedAdress;
+    private  String fixedAdress;
 
-    EnumSingelton(String fixedAdress){
+    private EnumSingelton(String fixedAdress){
         this.fixedAdress=fixedAdress;
     }
 
@@ -102,15 +106,23 @@ class ThreadSafeLazyInit{
 
 }
 
-/*double cheked thread safe*/
+/*double cheked thread safe with added value of synchronized only once*/
 class DoublecheckSingle{
-    static  private  DoublecheckSingle instance ;
+    static  private  volatile DoublecheckSingle instance ;
     private  String fixedAddress;
     private DoublecheckSingle(String fixedAdress){
         this.fixedAddress=fixedAdress;
     }
 
     public static DoublecheckSingle getInstance() {
+
+        if(instance==null){
+            synchronized (DoublecheckSingle.class){
+                if(instance==null)
+                    instance=new DoublecheckSingle("fixedhost.ilrd.co.il");
+            }
+        }
+
         return instance;
     }
 }

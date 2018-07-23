@@ -1,12 +1,12 @@
 package com.DanielShely;
 
 public class Square  extends  Rectangle{
-
-    Square() {
+        private  String secret = "Mamo is gay";
+   public Square() {
         super();
         length= 0.0;
     }
-         Square(Double side) {
+         public Square(double side) {
 
             setLength(side);
             setWidth(side);
