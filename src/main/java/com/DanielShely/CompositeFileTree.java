@@ -1,15 +1,20 @@
 package com.DanielShely;
 
-import com.sun.xml.internal.ws.server.ServerRtException;
+
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class CompositeFileTree {
-    public static void main(String[] args) {
-        Composite c =new Directory("/home/daniel/Documents/JavaRep/JavaRepeat/src/",0);
-        c.print();
+    public static void main(String[] args) throws InterruptedException {
+        Composite comp = new Composite() {
+            int c = 7;
 
+            public void print() {
+                System.out.println("fuck youuuuuuuuuuuuuuuu" + c);
+            }
+        };
+        comp.print();
 
     }
 }
@@ -82,7 +87,7 @@ class FileLeaf implements  Composite{
         }
 }
 
+
 interface Composite {
     void print();
-
 }

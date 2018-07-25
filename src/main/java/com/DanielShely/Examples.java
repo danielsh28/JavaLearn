@@ -1,8 +1,68 @@
 package com.DanielShely;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Queue;
 
+
+class Generics<T extends Shape >{
+    private T data;
+
+    T pick(T a1, T a2) {
+        return a2;
+    }
+
+    void printInfo(){
+        new B().foo(8.88);
+    }
+     private T fromInner(){
+        System.out.println("return data of: " + data);
+        return data;
+    }
+
+
+    static class B {
+        private int i;
+
+        static private <T> void   foo(T t){
+            System.out.println("Inside foo method  of the inner class of b \nand" +
+                    " argument is " + t.toString() + " from type " +  t.getClass().getName()
+            + "\nwhile data is not valid  ");
+            /* + data);
+            fromInner();*/
+        }
+    }
+
+    Generics(T data){
+        this.data=data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public static void main(String[] args) {
+        Generics<Rectangle> g = new Generics<>(new Rectangle(4d,7d,"fucking Yellow", true ));
+        Generics.B.foo(8);
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
 class ThreadIsAbitch{
     static Queue list = new java.util.LinkedList();
      public static void main(String[] args) throws InterruptedException {
@@ -62,4 +122,4 @@ class ThreadIsAbitch{
 
      }
 
-}
+}*/
