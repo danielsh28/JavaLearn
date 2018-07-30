@@ -3,7 +3,7 @@ package com.DanielShely;
 
 import java.util.NoSuchElementException;
 
-public class LinkedList {
+public class LinkedList<T> {
 
    private  Node stubHead;
     private long size;
@@ -25,7 +25,7 @@ public class LinkedList {
     }
 
 
-    public void pushFront(Object data) {
+    public void pushFront(T data) {
 
         Node newNode=new Node(data,stubHead.next);
         stubHead.next=newNode;
@@ -33,11 +33,11 @@ public class LinkedList {
 
     }
 
-    public Object popFront() {
+    public T popFront() {
         Node popNode=stubHead.next;
-        Object ret=null;
+        T ret=null;
         if(popNode!=null) {
-           ret= popNode.data;
+           ret =  (T) popNode.data;
             stubHead.next = stubHead.next.next;
             popNode.next = null;
         }
@@ -45,7 +45,7 @@ public class LinkedList {
         return ret;
     }
 
-    public LinkedListItr find(Object obj) {
+    public LinkedListItr find(T obj) {
          LinkedListItr itr = this.begin();
 
          while(itr.hasNext()){
@@ -65,11 +65,11 @@ public class LinkedList {
         return new LinkedListItr(stubHead);
     }
 
-    private class Node {
-        private Object data;
+    private  class  Node <T> {
+        private T data;
         private Node next;
 
-        Node(Object data, Node next) {
+        Node(T data, Node next) {
             this.data= data;
             this.next=next;
         }
@@ -77,14 +77,14 @@ public class LinkedList {
 
     }
 
-    public class LinkedListItr implements listIterator {
+     class LinkedListItr implements listIterator {
 
         private Node curr_node;
         /* private method to peek current node data without increment to next node*/
-        private Object getData(){
+        private T getData(){
 
 
-            return curr_node==null?null:curr_node.data;
+            return curr_node==null?null: (T) curr_node.data;
         }
 
         LinkedListItr(Node node){
@@ -98,11 +98,11 @@ public class LinkedList {
         }
 
 
-        public Object next() throws NoSuchElementException{
+        public T next() throws NoSuchElementException{
 
             if(!(curr_node.next ==null)){
                 curr_node=curr_node.next;
-                return curr_node.data;
+                return (T) curr_node.data;
             }
             else{
                 throw new NoSuchElementException();
@@ -113,12 +113,16 @@ public class LinkedList {
 }
 
 
-interface listIterator{
+interface listIterator<T>{
 
     boolean hasNext();
-    Object next() throws NoSuchElementException;
+
+   T next() throws NoSuchElementException;
 
 }
+
+
+
 
 
 

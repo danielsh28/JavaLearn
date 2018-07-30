@@ -28,7 +28,7 @@ public class Main {
        }
         i=0;
        while(i<size){
-           list.pushFront()
+
            ++i;
 
        }
